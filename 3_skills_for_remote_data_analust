@@ -1,0 +1,25 @@
+/*
+This SQL query retrieves the top 5 skills required for remote Data Analyst job postings. 
+It counts the occurrences of each skill associated with remote Data Analyst jobs and orders them by frequency.
+*/
+
+WITH remote_job_skills AS (
+    SELECT
+        skill_id,
+        COUNT(*) AS skill_count
+    FROM skills_job_dim AS skill_to_job
+    INNER JOIN job_postings_fact AS job ON skill_to_job.job_id = job.job_id
+    WHERE
+        job.job_work_from_home = TRUE AND
+        job.job_title_short = 'Data Analyst' 
+    Group BY skill_id
+)
+
+SELECT
+    skills.skill_id,
+    skills AS skill_name,
+    skill_count
+FROM remote_job_skills 
+INNER JOIN skills_dim AS skills ON remote_job_skills.skill_id = skills.skill_id
+ORDER BY skill_count DESC
+Limit 5
